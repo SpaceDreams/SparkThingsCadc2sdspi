@@ -7,7 +7,6 @@
 static const char *SDTAG = "init_SD";
 
 #define SPI_DMA_CHAN        SPI_DMA_CH_AUTO
-#define NUM_CHANNELS        (1) // For mono recording only!
 #define SD_MOUNT_POINT      "/sdcard"
 #define PIN_NUM_MISO  CONFIG_INIT_SPI_MISO_GPIO
 #define PIN_NUM_MOSI  CONFIG_INIT_SPI_MOSI_GPIO

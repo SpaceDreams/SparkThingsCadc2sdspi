@@ -59,19 +59,18 @@ void record_wav(uint32_t rec_time)
          * `adc_continuous_read()` here in a loop, with/without a certain block timeout.
          */
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        while(flash_wr_size < flash_rec_time){
         // Read the RAW samples from the microphone
         ret = adc_continuous_read(handle, result, init_READ_LEN, &ret_num, 0);
-        if(ret==ESP_OK){
+        while(ret==ESP_OK){
             adc_continuous_data_t parsed_data[ret_num / SOC_ADC_DIGI_RESULT_BYTES];
             uint32_t num_parsed_samples = 0;
             esp_err_t parse_ret = adc_continuous_parse_data(handle, result, ret_num, parsed_data, &num_parsed_samples);
             if(parse_ret==ESP_OK){
+                uint16_t buff[num_parsed_samples];
                 for (int i = 0; i < num_parsed_samples; i++) {
                         if (parsed_data[i].valid) {
-                            // Write the samples to the WAV file
-                            fwrite(&parsed_data[i].raw_data, sizeof(parsed_data[i].raw_data), 1, f);
-                            flash_wr_size += sizeof(parsed_data[i].raw_data);
+                            //
+                            buff[i]=parsed_data[i].raw_data;
                         } else {
                             ESP_LOGW(TAG, "Invalid data [ADC%d_Ch%d_%"PRIu32"]",
                                      parsed_data[i].unit + 1,
@@ -79,15 +78,19 @@ void record_wav(uint32_t rec_time)
                                      parsed_data[i].raw_data);
                         }
                     }
+                    // Write the samples to the WAV file
+                    fwrite(buff, sizeof(buff), 1, f);
+                    flash_wr_size += sizeof(buff);
+                    fflush(f);
             } else{
                 ESP_LOGE(TAG, "Data parsing failed: %s", esp_err_to_name(parse_ret));
             }
-        } else if(ret == ESP_ERR_TIMEOUT){
+        }
+        if(ret == ESP_ERR_TIMEOUT){
             ESP_LOGE(TAG, "ADC Timeout Error");
             //We try to read `init_READ_LEN` until API returns timeout, which means there's no available data
             break;
         }
-    }
     }
     ESP_LOGI(TAG, "Recording done!");
     fclose(f);

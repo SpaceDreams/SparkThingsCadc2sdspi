@@ -42,13 +42,13 @@ static void continuous_adc_init(adc_channel_t *channel, uint8_t channel_num, adc
     adc_continuous_handle_t handle = NULL;
 
     adc_continuous_handle_cfg_t adc_config = {
-        .max_store_buf_size = 1024,
+        .max_store_buf_size = init_READ_LEN*4,
         .conv_frame_size = init_READ_LEN,
     };
     ESP_ERROR_CHECK(adc_continuous_new_handle(&adc_config, &handle));
 
     adc_continuous_config_t dig_cfg = {
-        .sample_freq_hz = init_ADC_SAMPLING_FREQ,
+        .sample_freq_hz = init_ADC_SAMPLING_FREQ, // Ensure this is >= 20000 (20 kHz)
         .conv_mode = init_ADC_CONV_MODE,
     };
 
