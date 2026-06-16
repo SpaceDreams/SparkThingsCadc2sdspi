@@ -8,10 +8,10 @@ static const char *SDTAG = "init_SD";
 
 #define SPI_DMA_CHAN        SPI_DMA_CH_AUTO
 #define SD_MOUNT_POINT      "/sdcard"
-#define PIN_NUM_MISO  CONFIG_INIT_SPI_MISO_GPIO
-#define PIN_NUM_MOSI  CONFIG_INIT_SPI_MOSI_GPIO
-#define PIN_NUM_CLK   CONFIG_INIT_SPI_SCLK_GPIO
-#define PIN_NUM_CS    CONFIG_INIT_SPI_CS_GPIO
+#define PIN_NUM_MISO        CONFIG_INIT_SPI_MISO_GPIO
+#define PIN_NUM_MOSI        CONFIG_INIT_SPI_MOSI_GPIO
+#define PIN_NUM_CLK         CONFIG_INIT_SPI_SCLK_GPIO
+#define PIN_NUM_CS          CONFIG_INIT_SPI_CS_GPIO
 
 // When testing SD and SPI modes, keep in mind that once the card has been
 // initialized in SPI mode, it can not be reinitialized in SD mode without
@@ -28,7 +28,7 @@ void mount_sdcard(void)
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = true,
         .max_files = 5,
-        .allocation_unit_size = 8 * 1024
+        .allocation_unit_size = 16 * 1024
     };
     ESP_LOGI(SDTAG, "Initializing SD card");
 
@@ -40,6 +40,8 @@ void mount_sdcard(void)
         .quadhd_io_num = -1,
         .max_transfer_sz = 4000,
     };
+    // Attach the SD Card device to the SPI Bus
+    host.slot = SPI3_HOST; // Map host to our initialized VSPI bus
     ret = spi_bus_initialize(host.slot, &bus_cfg, SPI_DMA_CHAN);
     if (ret != ESP_OK) {
         ESP_LOGE(SDTAG, "Failed to initialize bus.");

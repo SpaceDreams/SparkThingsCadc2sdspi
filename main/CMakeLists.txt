@@ -1,3 +1,3 @@
 idf_component_register(SRCS "ADC2sdspi.c"
-                    PRIV_REQUIRES esp_adc fatfs
+                    REQUIRES initADC initSD
                     INCLUDE_DIRS "." "include")
