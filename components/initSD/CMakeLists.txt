@@ -1,3 +1,3 @@
-idf_component_register(SRCS "cmd_nvs.c"
+idf_component_register(SRCS "initSD.c"
                     INCLUDE_DIRS .
-                    REQUIRES console nvs_flash)
+                    REQUIRES fatfs)
