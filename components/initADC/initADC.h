@@ -3,6 +3,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#pragma once
+
 
 #include <string.h>
 #include <stdio.h>
@@ -22,12 +24,17 @@
 
 #define init_READ_LEN                    256
 
+adc_channel_t channel[1] = {ADC_CHANNEL_7};
 
-static adc_channel_t channel[1] = {ADC_CHANNEL_7};
+TaskHandle_t s_task_handle;
+const char *ADCTAG = "init_ADC";
 
-static TaskHandle_t s_task_handle;
-static const char *ADCTAG = "init_ADC";
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static bool IRAM_ATTR s_conv_done_cb(adc_continuous_handle_t handle, const adc_continuous_evt_data_t *edata, void *user_data)
+void continuous_adc_init(adc_channel_t *channel, uint8_t channel_num, adc_continuous_handle_t *out_handle);
 
-static void continuous_adc_init(adc_channel_t *channel, uint8_t channel_num, adc_continuous_handle_t *out_handle)
+#ifdef __cplusplus
+}
+#endif

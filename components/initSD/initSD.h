@@ -1,10 +1,11 @@
+#pragma once
 #include <string.h>
 #include <sys/unistd.h>
 #include <sys/stat.h>
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 
-static const char *SDTAG = "init_SD";
+const char *SDTAG = "init_SD";
 
 #define SPI_DMA_CHAN        SPI_DMA_CH_AUTO
 #define SD_MOUNT_POINT      "/sdcard"
@@ -19,4 +20,12 @@ static const char *SDTAG = "init_SD";
 sdmmc_host_t host = SDSPI_HOST_DEFAULT();
 sdmmc_card_t *card;
 
-void mount_sdcard(void){}
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void mount_sdcard(void);
+
+#ifdef __cplusplus
+}
+#endif
