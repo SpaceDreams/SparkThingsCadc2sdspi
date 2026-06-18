@@ -24,10 +24,11 @@
 
 #define init_READ_LEN                    256
 
-adc_channel_t channel[1] = {ADC_CHANNEL_7};
+extern adc_channel_t channel[1];// The size is defined here because the sizeof function is used somewhere
+extern const size_t NumOfChannelsUsed;
 
-TaskHandle_t s_task_handle;
-const char *ADCTAG = "init_ADC";
+extern TaskHandle_t s_task_handle;
+
 
 #ifdef __cplusplus
 extern "C" {

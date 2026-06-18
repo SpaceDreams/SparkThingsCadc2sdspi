@@ -5,8 +5,6 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 
-const char *SDTAG = "init_SD";
-
 #define SPI_DMA_CHAN        SPI_DMA_CH_AUTO
 #define SD_MOUNT_POINT      "/sdcard"
 #define PIN_NUM_MISO        CONFIG_INIT_SPI_MISO_GPIO
@@ -17,8 +15,8 @@ const char *SDTAG = "init_SD";
 // When testing SD and SPI modes, keep in mind that once the card has been
 // initialized in SPI mode, it can not be reinitialized in SD mode without
 // toggling power to the card.
-sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-sdmmc_card_t *card;
+extern sdmmc_host_t host;
+extern sdmmc_card_t *card;
 
 #ifdef __cplusplus
 extern "C" {

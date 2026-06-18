@@ -5,6 +5,12 @@
  */
 
 #include "initADC.h"
+adc_channel_t channel[] = {ADC_CHANNEL_7};
+const size_t NumOfChannelsUsed=sizeof(channel);
+
+TaskHandle_t s_task_handle;
+
+const char ADCTAG[] = "init_ADC";
 
 void continuous_adc_init(adc_channel_t *channel, uint8_t channel_num, adc_continuous_handle_t *out_handle)
 {

@@ -1,4 +1,13 @@
-#include "initSD.h"
+#include "initSDspi.h"
+
+const char SDTAG[] = "init_SD";
+
+// When testing SD and SPI modes, keep in mind that once the card has been
+// initialized in SPI mode, it can not be reinitialized in SD mode without
+// toggling power to the card.
+sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+sdmmc_card_t *card;
+
 void mount_sdcard(void)
 {
     esp_err_t ret;

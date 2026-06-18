@@ -1,10 +1,7 @@
-#include <string.h>
-#include "initADC.h"
-#include "initSD.h"
-#include "format_wav.h"
+#include "ADC2sd.h"
 
 
-static const char *TAG = "ADC_rec_example";
+static const char *ADC2sdTAG = "ADC_2_SD";
 
 bool IRAM_ATTR s_conv_done_cb(adc_continuous_handle_t handle, const adc_continuous_evt_data_t *edata, void *user_data)
 {
@@ -23,7 +20,7 @@ void record_wav(uint32_t rec_time, const char *filename)
     snprintf(filedir, sizeof(filedir), "%s%s", SD_MOUNT_POINT, filename);
     //SD setup
     // Use POSIX and C standard library functions to work with files.
-    ESP_LOGI(TAG, "Opening file");
+    ESP_LOGI(ADC2sdTAG, "Opening file");
 
     int total_samples_remaining = init_ADC_SAMPLING_FREQ * rec_time;
     const wav_header_t wav_header =
@@ -39,7 +36,7 @@ void record_wav(uint32_t rec_time, const char *filename)
     // Create new WAV file
     FILE *f = fopen(filedir, "wb");
     if (f == NULL) {
-        ESP_LOGE(TAG, "Failed to open file for writing");
+        ESP_LOGE(ADC2sdTAG, "Failed to open file for writing");
         return;
     }
 
@@ -53,7 +50,7 @@ void record_wav(uint32_t rec_time, const char *filename)
     memset(result, 0xcc, init_READ_LEN);
     adc_continuous_handle_t handle = NULL;
     s_task_handle = xTaskGetCurrentTaskHandle();
-    continuous_adc_init(channel, sizeof(channel) / sizeof(adc_channel_t), &handle);
+    continuous_adc_init(channel, NumOfChannelsUsed / sizeof(adc_channel_t), &handle);
     adc_continuous_evt_cbs_t cbs = {
         .on_conv_done = s_conv_done_cb,
     };
@@ -85,38 +82,29 @@ void record_wav(uint32_t rec_time, const char *filename)
                             fwrite(&parsed_data[i].raw_data, 2, 1, f);
                             total_samples_remaining -= 1;
                         } else {
-                            ESP_LOGW(TAG, "Invalid data [ADC%d_Ch%d_%"PRIu32"]",
+                            ESP_LOGW(ADC2sdTAG, "Invalid data [ADC%d_Ch%d_%"PRIu32"]",
                                      parsed_data[i].unit + 1,
                                      parsed_data[i].channel,
                                      parsed_data[i].raw_data);
                         }
                     }
             } else{
-                ESP_LOGE(TAG, "Data parsing failed: %s", esp_err_to_name(parse_ret));
+                ESP_LOGE(ADC2sdTAG, "Data parsing failed: %s", esp_err_to_name(parse_ret));
             }
         }
         if(ret == ESP_ERR_TIMEOUT){
-            ESP_LOGE(TAG, "ADC Timeout Error");
+            ESP_LOGE(ADC2sdTAG, "ADC Timeout Error");
             //We try to read `init_READ_LEN` until API returns timeout, which means there's no available data
             break;
         }
     }
-    ESP_LOGI(TAG, "Recording done!");
+    ESP_LOGI(ADC2sdTAG, "Recording done!");
     fclose(f);
-    ESP_LOGI(TAG, "File written on SDCard");
+    ESP_LOGI(ADC2sdTAG, "File written on SDCard");
     // All done, Turn off ADC
     ESP_ERROR_CHECK(adc_continuous_stop(handle));
     ESP_ERROR_CHECK(adc_continuous_deinit(handle));
     // All done, unmount partition and disable SPI peripheral
     esp_vfs_fat_sdcard_unmount(SD_MOUNT_POINT, card);
-    ESP_LOGI(TAG, "Card unmounted");
-}
-
-void app_main(void)
-{
-    printf("ADC recording example start\n--------------------------------------\n");
-    ESP_LOGI(TAG, "Starting the recording for %d seconds!", CONFIG_REC_TIME);
-    const char *filename = "/record.wav";
-    // Start Recording
-    record_wav(CONFIG_REC_TIME, filename);
+    ESP_LOGI(ADC2sdTAG, "Card unmounted");
 }

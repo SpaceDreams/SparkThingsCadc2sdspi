@@ -1,3 +1,3 @@
-idf_component_register(SRCS "initSD.c"
+idf_component_register(SRCS "initSDspi.c"
                     INCLUDE_DIRS .
                     REQUIRES fatfs)
